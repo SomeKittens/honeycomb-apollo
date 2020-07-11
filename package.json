@@ -19,5 +19,9 @@
   "types": "index.d.ts",
   "scripts": {
     "prepublish": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "SomeKittens/honeycomb-apollo"
   }
 }
