@@ -1,0 +1,23 @@
+{
+  "name": "honeycomb-apollo",
+  "description": "An Apollo extension to trace resolvers via Honeycomb",
+  "dependencies": {
+    "apollo-server-core": "^2.15.1",
+    "apollo-server-plugin-base": "^0.9.1",
+    "graphql": "^15.3.0",
+    "honeycomb-beeline": "^2.1.1",
+    "typescript": "3"
+  },
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": {
+    "email": "rkoutnik@gmail.com",
+    "name": "Randall Koutnik",
+    "url": "https://rkoutnik.com/"
+  },
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "prepublish": "tsc"
+  }
+}
