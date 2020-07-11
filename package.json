@@ -8,7 +8,7 @@
     "honeycomb-beeline": "^2.1.1",
     "typescript": "3"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "author": {
     "email": "rkoutnik@gmail.com",
