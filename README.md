@@ -27,6 +27,6 @@ And you're good to go!
 
 # Thanks to
 
- - [Ally Weir](https://gist.github.com/allyjweir)
- - Marco Rogers
+ - [Ally Weir](https://github.com/allyjweir)
+ - [Marco Rogers](https://github.com/polotek)
  - Everyone in the Pollinators Slack
