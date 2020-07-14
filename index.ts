@@ -41,14 +41,12 @@ const generateResolverCtx = (path: ResponsePath, returnType: GraphQLOutputType, 
   const context = {
     name: fieldResponsePath,
     type: 'graphql_field_resolver',
-    'graphql.parent_type': parentResponsePathAsString(path),
+    'graphql.parent_type': parentType.toString(),
+    'graphql.parent_path': parentResponsePathAsString(path),
+    'graphql.type': returnType.toString(),
     'graphql.field_path': fieldResponsePath,
     'graphql.query': getRootQuery(path),
   };
-
-  if (returnType) {
-    context['graphql.type'] = returnType.toString();
-  }
 
   const id = path && path.key;
   if (path && path.prev && typeof path.prev.key === 'number') {
