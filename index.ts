@@ -9,19 +9,6 @@ import { ApolloServerPlugin } from 'apollo-server-plugin-base';
 
 import { responsePathAsString } from './responsePath';
 
-
-// o: {
-//   request: Request;
-//   queryString ?: string;
-//   parsedQuery ?: DocumentNode;
-//   variables ?: Record<string, any>;
-//   persistedQueryHit ?: boolean;
-//   persistedQueryRegister ?: boolean;
-//   context: TContext;
-//   extensions ?: Record<string, any>;
-//   requestContext: GraphQLRequestContext<TContext>;
-// }
-
 const generateResolverCtx = (path: ResponsePath, returnType: GraphQLOutputType, parentType: GraphQLCompositeType) => {
   const fieldResponsePath = responsePathAsString(path);
   const context = {
@@ -63,7 +50,6 @@ export const honeycombTracingPlugin = (_futureOptions = {}) => (): ApolloServerP
           executionDidEnd: () => {
             // not sure if we need this?
             // or finish the span here?
-            console.log('executionDidEnd');
           },
           willResolveField: ({ info }) => {
             // TODO: figure out if we can manually set parentId here
@@ -83,13 +69,11 @@ export const honeycombTracingPlugin = (_futureOptions = {}) => (): ApolloServerP
              * Instead, we start an Async span, since those don't implicitly become children of the current span
              */
             return beeline.startAsyncSpan(generateResolverCtx(info.path, info.returnType, info.parentType), span => {
-              console.log('creating span');
               let res;
               new Promise(resolve => {
                 res = resolve;
               })
                 .then((err?: Error) => {
-                  console.log('done, finishing span');
                   if (err) {
                     beeline.customContext.add({ error: err.message });
                   }
@@ -102,7 +86,6 @@ export const honeycombTracingPlugin = (_futureOptions = {}) => (): ApolloServerP
         };
       },
       willSendResponse: () => {
-        console.log('willSendResponse');
         // Now we're done
         // TODO: Verify all spans have closed
         beeline.finishSpan(rootSpan);
@@ -110,101 +93,3 @@ export const honeycombTracingPlugin = (_futureOptions = {}) => (): ApolloServerP
     }
   }
 });
-
-
-
-
-
-
-// export class HoneycombTracingExtension<TContext = any> implements GraphQLExtension<TContext> {
-//   public APOLLO_TRACING_EXTENSION_VERSION = 1;
-
-//   public queryString: string;
-
-//   public documentAST: DocumentNode;
-
-//   public operationName: string;
-
-//   public rootSpan;
-
-//   public constructor() {
-//     beeline.customContext.add({ APOLLO_TRACING_EXTENSION_VERSION: this.APOLLO_TRACING_EXTENSION_VERSION });
-//   }
-
-//   public requestDidStart(o: {
-//     request: Request;
-//     queryString?: string;
-//     parsedQuery?: DocumentNode;
-//     variables?: Record<string, any>;
-//     persistedQueryHit?: boolean;
-//     persistedQueryRegister?: boolean;
-//     context: TContext;
-//     extensions?: Record<string, any>;
-//     requestContext: GraphQLRequestContext<TContext>;
-//   }): EndHandler {
-//     // Generally, we'll get queryString here and not parsedQuery; we only get
-//     // parsedQuery if you're using an OperationStore. In normal cases we'll get
-//     // our documentAST in the execution callback after it is parsed.
-//     this.queryString = o.queryString;
-//     this.documentAST = o.parsedQuery;
-
-//     this.rootSpan = beeline.startSpan({ name: 'graphql_query' });
-//     this.rootSpan.addContext({ 'graphql.query_string': this.queryString });
-
-//     return () => {
-//       beeline.finishSpan(this.rootSpan);
-//     };
-//   }
-
-//   public executionDidStart(o: { executionArgs: ExecutionArgs }) {
-//     // If the operationName is explicitly provided, save it. If there's just one
-//     // named operation, the client doesn't have to provide it, but we still want
-//     // to know the operation name so that the server can identify the query by
-//     // it without having to parse a signature.
-//     //
-//     // Fortunately, in the non-error case, we can just pull this out of
-//     // the first call to willResolveField's `info` argument.  In an
-//     // error case (eg, the operationName isn't found, or there are more
-//     // than one operation and no specified operationName) it's OK to continue
-//     // to file this trace under the empty operationName.
-//     if (o.executionArgs.operationName) {
-//       this.operationName = o.executionArgs.operationName;
-//       this.rootSpan.addContext({ 'graphql.operation_name': this.operationName });
-//     }
-//     this.documentAST = o.executionArgs.document;
-//   }
-
-//   public willResolveField(
-//     _source: any,
-//     _args: { [argName: string]: any },
-//     _context: TContext,
-//     info: GraphQLResolveInfo,
-//   ): ((error: Error | null, result: any) => void) | void {
-//     if (this.operationName === undefined) {
-//       this.operationName = (info.operation.name && info.operation.name.value) || '';
-//       this.rootSpan.addContext({ 'graphql.operation_name': this.operationName });
-//     }
-
-
-    
-//   }
-
-//   private newSpan(path: ResponsePath, returnType: GraphQLOutputType, parentType: GraphQLCompositeType) {
-//     const fieldResponsePath = responsePathAsString(path);
-//     const context = {
-//       name: 'graphql_field_resolver',
-//       'graphql.type': returnType.toString(),
-//       'graphql.parent_type': parentType.toString(),
-//       'graphql.field_path': fieldResponsePath,
-//     };
-
-//     const id = path && path.key;
-//     if (path && path.prev && typeof path.prev.key === 'number') {
-//       context['graphql.field_name'] = `${path.prev.key}.${id}`;
-//     } else {
-//       context['graphql.field_name'] = id;
-//     }
-
-//     return context;
-//   }
-// }
