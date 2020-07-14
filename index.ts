@@ -7,17 +7,48 @@ import {
 } from 'graphql';
 import { ApolloServerPlugin } from 'apollo-server-plugin-base';
 
-import { responsePathAsString } from './responsePath';
+const responsePathArray = (rp: ResponsePath): (string | number)[] => {
+  const path = [rp.key];
+  while (rp.prev) {
+    rp = rp.prev;
+    path.unshift(rp.key);
+  }
+  return path;
+};
+
+const responsePathAsString = (rp: ResponsePath) => {
+  return responsePathArray(rp).join('.');
+};
+const parentResponsePathAsString = (rp: ResponsePath): string => {
+  return responsePathArray(rp).slice(0, -1).join('.');
+};
+const parentResponsePathAsNumberlessString = (rp) => {
+  const rpa = responsePathArray(rp).slice(0, -1);
+  if (typeof rpa[rpa.length - 1] === 'number') {
+    return rpa.slice(0, -1).join('.');
+  }
+  return rpa.join('.');
+};
+const getRootQuery = (rp: ResponsePath) => {
+  while (rp.prev) {
+    rp = rp.prev;
+  }
+  return rp.key;
+}
 
 const generateResolverCtx = (path: ResponsePath, returnType: GraphQLOutputType, parentType: GraphQLCompositeType) => {
   const fieldResponsePath = responsePathAsString(path);
   const context = {
     name: fieldResponsePath,
     type: 'graphql_field_resolver',
-    'graphql.type': returnType.toString(),
-    'graphql.parent_type': parentType.toString(),
+    'graphql.parent_type': parentResponsePathAsString(path),
     'graphql.field_path': fieldResponsePath,
+    'graphql.query': getRootQuery(path),
   };
+
+  if (returnType) {
+    context['graphql.type'] = returnType.toString();
+  }
 
   const id = path && path.key;
   if (path && path.prev && typeof path.prev.key === 'number') {
