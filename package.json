@@ -2,11 +2,11 @@
   "name": "honeycomb-apollo",
   "description": "An Apollo extension to trace resolvers via Honeycomb",
   "dependencies": {
-    "apollo-server-core": "^2.15.1",
+    "apollo-server-core": "^2.16.1",
     "apollo-server-plugin-base": "^0.9.1",
     "graphql": "^15.3.0",
-    "honeycomb-beeline": "^2.1.1",
-    "typescript": "3"
+    "honeycomb-beeline": "^2.3.0",
+    "typescript": "^3.9.7"
   },
   "version": "0.1.4",
   "license": "MIT",
