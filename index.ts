@@ -59,10 +59,10 @@ const generateResolverCtx = (path: ResponsePath, returnType: GraphQLOutputType, 
 }
 
 interface HoneycombTracingPluginOptions {
-  deep: boolean;
+  deep?: boolean;
 }
 
-export const honeycombTracingPlugin = ({ deep }: HoneycombTracingPluginOptions) => (): ApolloServerPlugin => ({
+export const honeycombTracingPlugin = ({ deep }: HoneycombTracingPluginOptions = {}) => (): ApolloServerPlugin => ({
   requestDidStart(requestContext: GraphQLRequestContext) {
     // Generally, we'll get queryString here and not parsedQuery; we only get
     // parsedQuery if you're using an OperationStore. In normal cases we'll get
