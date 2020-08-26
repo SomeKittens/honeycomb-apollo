@@ -58,7 +58,11 @@ const generateResolverCtx = (path: ResponsePath, returnType: GraphQLOutputType, 
   return context;
 }
 
-export const honeycombTracingPlugin = (_futureOptions = {}) => (): ApolloServerPlugin => ({
+interface HoneycombTracingPluginOptions {
+  deep: boolean;
+}
+
+export const honeycombTracingPlugin = ({ deep }: HoneycombTracingPluginOptions) => (): ApolloServerPlugin => ({
   requestDidStart(requestContext: GraphQLRequestContext) {
     // Generally, we'll get queryString here and not parsedQuery; we only get
     // parsedQuery if you're using an OperationStore. In normal cases we'll get
@@ -81,6 +85,9 @@ export const honeycombTracingPlugin = (_futureOptions = {}) => (): ApolloServerP
             // or finish the span here?
           },
           willResolveField: ({ info }) => {
+            if (!deep) {
+              return;
+            }
             // TODO: figure out if we can manually set parentId here
 
             /**
