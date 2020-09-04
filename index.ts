@@ -60,9 +60,10 @@ const generateResolverCtx = (path: ResponsePath, returnType: GraphQLOutputType, 
 
 interface HoneycombTracingPluginOptions {
   deep?: boolean;
+  includeVariables?: boolean;
 }
 
-export const honeycombTracingPlugin = ({ deep }: HoneycombTracingPluginOptions = {}) => (): ApolloServerPlugin => ({
+export const honeycombTracingPlugin = ({ deep, includeVariables }: HoneycombTracingPluginOptions = {}) => (): ApolloServerPlugin => ({
   requestDidStart(requestContext: GraphQLRequestContext) {
     // Generally, we'll get queryString here and not parsedQuery; we only get
     // parsedQuery if you're using an OperationStore. In normal cases we'll get
@@ -72,12 +73,20 @@ export const honeycombTracingPlugin = ({ deep }: HoneycombTracingPluginOptions =
     rootSpan.addContext({ 'graphql.query_string': queryString });
 
     return {
-      executionDidStart: ({ operationName }) => {
+      executionDidStart: ({ operationName, request }) => {
         // If the operationName is explicitly provided, save it. If there's just one
         // named operation, the client doesn't have to provide it, but we still want
         // to know the operation name so that the server can identify the query by
         // it without having to parse a signature.
         rootSpan.addContext({ 'graphql.operation_name': operationName });
+
+        console.log('variables', request.variables);
+        if (includeVariables && request.variables) {
+          for (const [key, value] of Object.entries(request.variables)) {
+            console.log(`${key}: ${value}`);
+            rootSpan.addContext({ [`graphql.variable.${key}`]: value });
+          }
+        }
 
         return {
           executionDidEnd: () => {
