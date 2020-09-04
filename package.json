@@ -5,7 +5,7 @@
     "apollo-server-core": "^2.16.1",
     "apollo-server-plugin-base": "^0.9.1",
     "graphql": "^14.2.1",
-    "honeycomb-beeline": "^2.3.0",
+    "honeycomb-beeline": "2",
     "typescript": "^3.9.7"
   },
   "version": "0.1.9",
