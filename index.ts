@@ -80,10 +80,8 @@ export const honeycombTracingPlugin = ({ deep, includeVariables }: HoneycombTrac
         // it without having to parse a signature.
         rootSpan.addContext({ 'graphql.operation_name': operationName });
 
-        console.log('variables', request.variables);
         if (includeVariables && request.variables) {
           for (const [key, value] of Object.entries(request.variables)) {
-            console.log(`${key}: ${value}`);
             rootSpan.addContext({ [`graphql.variable.${key}`]: value });
           }
         }
