@@ -104,7 +104,7 @@ export const honeycombTracingPlugin = (_futureOptions = {}) => (): ApolloServerP
               })
                 .then((err?: Error) => {
                   if (err) {
-                    beeline.customContext.add({ error: err.message });
+                    beeline.addTraceContext({ error: err.message });
                   }
                   beeline.finishSpan(span);
                 });
